@@ -33,6 +33,8 @@ class MotorIO(motor.Motor):
         Method to stop Motor/PWM
         """
         self.motor.stop()
+        self.set_direction(False)
+        self.change_direction()
         
     def motor_start(self):
         """
@@ -58,23 +60,35 @@ class MotorIO(motor.Motor):
         else:
             GPIO.output(self.direction_pin,GPIO.LOW)
 
-class MotorA(MotorIO):
+class MotorX(MotorIO):
     """
     Helper class to make it easier for beginners to use modules
     """
-    def __init__(self):
+    def __init__(self, ident):
         """
-        Initialise Parent Class with preset GPIO
+        Initialise Parent Class with preset GPIO for motor A and B
         """
-        super().__init__(21,12)
- 
+        
+        if ident == "A":
+            super().__init__(22,12)
+        else:
+            super().__init__(23,13)
+         
     def run(self, direction, speed):
         """
         Method to run Motor with given direction and speed
         """
+        if speed > 100 or speed < 0:
+            print ("speed out of range")
+            return None
+        
         self.motor_start()
         self.set_direction(direction)
-        self.set_speed(speed)
+        
+        if direction:
+            self.set_speed(100 - speed)
+        else:
+            self.set_speed(speed)
         self.change_direction()
         self.change_speed()
     
@@ -88,54 +102,40 @@ class MotorA(MotorIO):
         """
         Method to change Motor speed
         """
-        self.set_speed(speed)        
-        self.change_speed()
-
-class MotorB(MotorIO):
-    """
-    Helper class to make it easier for beginners to use modules
-    """    
-    def __init__(self):
-        """
-        Initialise Parent Class with preset GPIO
-        """
-        super().__init__(22,13)
- 
-    def run(self, direction, speed):
-        """
-        Method to run Motor with given direction and speed
-        """
-        self.motor_start()
-        self.set_direction(direction)
-        self.set_speed(speed)
-        self.change_direction()
-        self.change_speed()
-    
-    def stop(self):
-        """
-        Method to stop motor
-        """
-        self.motor_stop()
-    
-    def adj_speed(self,speed):
-        """
-        Method to change Motor speed
-        """
-        self.set_speed(speed)        
+        if speed > 100 or speed < 0:
+            print("speed out of range")
+            return None
+        if self.get_direction():
+            self.set_speed(100 - speed)
+        else:
+            self.set_speed(speed)        
         self.change_speed()
 
 # Testing
 if __name__ == "__main__":
     import time    
-    motorA = MotorA()
-    motorA.run(False, 70)
+    motorA = MotorX("A")
+    motorB = MotorX("B")
+    motorA.run(False, 60)
+    motorB.run(False, 60)
     time.sleep(5)
     motorA.adj_speed(90)
+    motorB.adj_speed(90)
+
     time.sleep(5)
     motorA.stop()
-    motorA.run(True,100)
+    motorB.stop()
+    
     time.sleep(5)
     motorA.run(True,70)
+    motorB.run(True,70)
+    
+    time.sleep(5)
+    motorA.run(True,90)
+    motorB.run(True,90)
+    
     time.sleep(5)
     motorA.stop()
-    motorA.run(False,0)
+    motorB.stop()
+    
+    #motorA.run(False,0)

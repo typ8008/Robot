@@ -28,4 +28,4 @@ class Motor:
         """
         Set Direction
         """
-        self.direction = direction
+        self.direction = direction  
