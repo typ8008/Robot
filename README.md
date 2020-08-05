@@ -5,6 +5,10 @@ To make life easier install Remote Desktop Software
   
       sudo apt-get upgrade
 
+Check if there is enough space
+      
+      df -h
+      
 In case there is not enough space use
 
      sudo apt-get clean
